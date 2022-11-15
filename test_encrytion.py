@@ -1,7 +1,7 @@
 import io
 import os
 import unittest
-from encryption import encrypt_file
+from encryption import encrypt_file, decrypt_file
 
 
 class BaseTestCase(unittest.TestCase):
@@ -25,4 +25,8 @@ class EncryptTestCase(BaseTestCase):
         output, fernet = encrypt_file(self.file_to_encrypt)
         # If text is encrypted it should allow you to decrypt
         self.assertTrue(fernet.decrypt(output), None)
-
+        # Now check we can decrypt with our method
+        file_decrypted = decrypt_file(output.decode(), fernet)
+        # this time the file is decrypted so if we try to decrypt again will raise error
+        with self.assertRaises(Exception):
+            self.assertFalse(file_decrypted.decrypt(output), None)
