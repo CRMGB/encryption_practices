@@ -1,14 +1,14 @@
 import io
 import os
 import unittest
-from . import encrypt_file, decrypt_file
+from encryption import encrypt_file, decrypt_file
 
 
 class BaseTestCase(unittest.TestCase):
 
     def setUp(self):
         # <-- absolute dir the script is in
-        self.script_dir = os.path.dirname(__file__)        
+        self.script_dir = os.path.dirname(__file__)
         self.file_to_encrypt = io.BytesIO()
 
 class EncryptTestCase(BaseTestCase):
@@ -23,4 +23,10 @@ class EncryptTestCase(BaseTestCase):
             self.file_to_encrypt.write(bytes(chunk))
         f.close()
         output, fernet = encrypt_file(self.file_to_encrypt)
+        # If text is encrypted it should allow you to decrypt
         self.assertTrue(fernet.decrypt(output), None)
+        # Now check we can decrypt with our method
+        file_decrypted = decrypt_file(output.decode(), fernet)
+        # this time the file is decrypted so if we try to decrypt again will raise error
+        with self.assertRaises(Exception):
+            self.assertFalse(file_decrypted.decrypt(output), None)
